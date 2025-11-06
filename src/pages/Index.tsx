@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,6 +45,29 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [playingMovie, setPlayingMovie] = useState<Movie | null>(null);
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('cinema-favorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+  }, []);
+
+  const toggleFavorite = (movieId: number) => {
+    setFavorites(prev => {
+      const newFavorites = prev.includes(movieId)
+        ? prev.filter(id => id !== movieId)
+        : [...prev, movieId];
+      localStorage.setItem('cinema-favorites', JSON.stringify(newFavorites));
+      return newFavorites;
+    });
+  };
+
+  const isFavorite = (movieId: number) => favorites.includes(movieId);
+
+  const allContent = [...mockMovies, ...mockSeries];
+  const favoriteMovies = allContent.filter(movie => favorites.includes(movie.id));
 
   const navItems = [
     { name: 'Главная', icon: 'Home' },
@@ -158,9 +181,14 @@ export default function Index() {
                           <Icon name="Play" size={20} className="mr-2" />
                           Смотреть сейчас
                         </Button>
-                        <Button size="lg" variant="outline" className="border-accent text-accent hover:bg-accent/10 font-semibold px-8">
-                          <Icon name="Plus" size={20} className="mr-2" />
-                          В избранное
+                        <Button 
+                          size="lg" 
+                          variant="outline" 
+                          className="border-accent text-accent hover:bg-accent/10 font-semibold px-8"
+                          onClick={() => toggleFavorite(mockMovies[0].id)}
+                        >
+                          <Icon name={isFavorite(mockMovies[0].id) ? 'Heart' : 'Plus'} size={20} className={`mr-2 ${isFavorite(mockMovies[0].id) ? 'fill-accent' : ''}`} />
+                          {isFavorite(mockMovies[0].id) ? 'В избранном' : 'В избранное'}
                         </Button>
                       </div>
                     </div>
@@ -210,6 +238,19 @@ export default function Index() {
                               <Icon name="Star" size={14} className="text-gold fill-gold" />
                               <span className="text-sm font-bold text-gold">{movie.rating}</span>
                             </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(movie.id);
+                              }}
+                              className="absolute top-3 left-3 bg-black/80 hover:bg-black/90 p-2 rounded-lg transition-all hover:scale-110"
+                            >
+                              <Icon 
+                                name="Heart" 
+                                size={18} 
+                                className={isFavorite(movie.id) ? 'text-gold fill-gold' : 'text-white'} 
+                              />
+                            </button>
                             <div 
                               className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                               onClick={(e) => {
@@ -255,9 +296,24 @@ export default function Index() {
                               <Icon name="Star" size={14} className="text-gold fill-gold" />
                               <span className="text-sm font-bold text-gold">{series.rating}</span>
                             </div>
-                            <Badge className="absolute top-3 left-3 bg-secondary border-secondary">
-                              Сериал
-                            </Badge>
+                            <div className="absolute top-3 left-3 flex flex-col gap-2">
+                              <Badge className="bg-secondary border-secondary">
+                                Сериал
+                              </Badge>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleFavorite(series.id);
+                                }}
+                                className="bg-black/80 hover:bg-black/90 p-2 rounded-lg transition-all hover:scale-110 w-fit"
+                              >
+                                <Icon 
+                                  name="Heart" 
+                                  size={18} 
+                                  className={isFavorite(series.id) ? 'text-gold fill-gold' : 'text-white'} 
+                                />
+                              </button>
+                            </div>
                             <div 
                               className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                               onClick={(e) => {
@@ -297,6 +353,68 @@ export default function Index() {
                     <Icon name="Film" size={64} className="mx-auto mb-4 opacity-50" />
                     <p className="text-xl">Введите запрос для поиска</p>
                   </div>
+                </div>
+              )}
+
+              {activeTab === 'Избранное' && (
+                <div>
+                  <h2 className="text-4xl font-bold mb-8 text-gold">Избранное</h2>
+                  {favoriteMovies.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-20">
+                      <Icon name="Heart" size={64} className="mx-auto mb-4 opacity-50" />
+                      <p className="text-xl mb-2">Здесь пока ничего нет</p>
+                      <p className="text-base">Добавляйте фильмы и сериалы в избранное, нажимая на ❤️</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-5 gap-6">
+                      {favoriteMovies.map((movie) => (
+                        <div
+                          key={movie.id}
+                          onClick={() => setSelectedMovie(movie)}
+                          className="group cursor-pointer"
+                        >
+                          <div className="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 shadow-lg hover-glow transition-all">
+                            <img
+                              src={movie.thumbnail}
+                              alt={movie.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute top-3 right-3 bg-black/80 px-2 py-1 rounded-lg flex items-center gap-1">
+                              <Icon name="Star" size={14} className="text-gold fill-gold" />
+                              <span className="text-sm font-bold text-gold">{movie.rating}</span>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(movie.id);
+                              }}
+                              className="absolute top-3 left-3 bg-black/80 hover:bg-black/90 p-2 rounded-lg transition-all hover:scale-110"
+                            >
+                              <Icon 
+                                name="Heart" 
+                                size={18} 
+                                className="text-gold fill-gold"
+                              />
+                            </button>
+                            <div 
+                              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlayMovie(movie);
+                              }}
+                            >
+                              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center shadow-gold cursor-pointer hover:scale-110 transition-transform">
+                                <Icon name="Play" size={32} className="text-black ml-1" />
+                              </div>
+                            </div>
+                          </div>
+                          <h4 className="font-semibold mb-1 group-hover:text-gold transition-colors">{movie.title}</h4>
+                          <p className="text-sm text-muted-foreground">{movie.year} • {movie.genre}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
