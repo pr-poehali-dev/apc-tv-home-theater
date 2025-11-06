@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import VideoPlayer from '@/components/VideoPlayer';
 
 interface Movie {
   id: number;
@@ -14,21 +15,22 @@ interface Movie {
   duration: string;
   thumbnail: string;
   featured?: boolean;
+  videoUrl?: string;
 }
 
 const mockMovies: Movie[] = [
-  { id: 1, title: 'Величайший Побег', year: 2024, rating: 8.9, genre: 'Боевик', duration: '2ч 15м', thumbnail: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500', featured: true },
-  { id: 2, title: 'Тайны Ночного Города', year: 2024, rating: 8.7, genre: 'Триллер', duration: '1ч 58м', thumbnail: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500', featured: true },
-  { id: 3, title: 'Звёздный Путь', year: 2023, rating: 9.1, genre: 'Фантастика', duration: '2ч 42м', thumbnail: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=500' },
-  { id: 4, title: 'Последний Рубеж', year: 2024, rating: 8.5, genre: 'Драма', duration: '2ч 8м', thumbnail: 'https://images.unsplash.com/photo-1518893063132-36e46dbe2428?w=500' },
-  { id: 5, title: 'Вечная Любовь', year: 2023, rating: 8.3, genre: 'Мелодрама', duration: '1ч 52м', thumbnail: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=500' },
-  { id: 6, title: 'Код Возмездия', year: 2024, rating: 8.8, genre: 'Боевик', duration: '2ч 5м', thumbnail: 'https://images.unsplash.com/photo-1574267432644-f610fa7a4896?w=500' },
+  { id: 1, title: 'Величайший Побег', year: 2024, rating: 8.9, genre: 'Боевик', duration: '2ч 15м', thumbnail: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500', featured: true, videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+  { id: 2, title: 'Тайны Ночного Города', year: 2024, rating: 8.7, genre: 'Триллер', duration: '1ч 58м', thumbnail: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500', featured: true, videoUrl: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+  { id: 3, title: 'Звёздный Путь', year: 2023, rating: 9.1, genre: 'Фантастика', duration: '2ч 42м', thumbnail: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+  { id: 4, title: 'Последний Рубеж', year: 2024, rating: 8.5, genre: 'Драма', duration: '2ч 8м', thumbnail: 'https://images.unsplash.com/photo-1518893063132-36e46dbe2428?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+  { id: 5, title: 'Вечная Любовь', year: 2023, rating: 8.3, genre: 'Мелодрама', duration: '1ч 52м', thumbnail: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+  { id: 6, title: 'Код Возмездия', year: 2024, rating: 8.8, genre: 'Боевик', duration: '2ч 5м', thumbnail: 'https://images.unsplash.com/photo-1574267432644-f610fa7a4896?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
 ];
 
 const mockSeries: Movie[] = [
-  { id: 7, title: 'Империя Теней', year: 2024, rating: 9.3, genre: 'Драма', duration: '8 сезонов', thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500' },
-  { id: 8, title: 'Квантовый Скачок', year: 2023, rating: 8.9, genre: 'Фантастика', duration: '3 сезона', thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500' },
-  { id: 9, title: 'Детективы Прошлого', year: 2024, rating: 8.6, genre: 'Детектив', duration: '5 сезонов', thumbnail: 'https://images.unsplash.com/photo-1509647648216-7c1f3add9a1d?w=500' },
+  { id: 7, title: 'Империя Теней', year: 2024, rating: 9.3, genre: 'Драма', duration: '8 сезонов', thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+  { id: 8, title: 'Квантовый Скачок', year: 2023, rating: 8.9, genre: 'Фантастика', duration: '3 сезона', thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+  { id: 9, title: 'Детективы Прошлого', year: 2024, rating: 8.6, genre: 'Детектив', duration: '5 сезонов', thumbnail: 'https://images.unsplash.com/photo-1509647648216-7c1f3add9a1d?w=500', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
 ];
 
 const collections = [
@@ -42,6 +44,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState('Главная');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [playingMovie, setPlayingMovie] = useState<Movie | null>(null);
 
   const navItems = [
     { name: 'Главная', icon: 'Home' },
@@ -54,8 +57,21 @@ export default function Index() {
     { name: 'Настройки', icon: 'Settings' },
   ];
 
+  const handlePlayMovie = (movie: Movie) => {
+    setPlayingMovie(movie);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-foreground">
+    <>
+      {playingMovie && (
+        <VideoPlayer
+          src={playingMovie.videoUrl || ''}
+          poster={playingMovie.thumbnail}
+          title={playingMovie.title}
+          onClose={() => setPlayingMovie(null)}
+        />
+      )}
+      <div className="min-h-screen bg-[#0A0A0A] text-foreground">
       <div className="flex h-screen">
         <aside className="w-72 border-r border-border bg-[#0D0D0D] flex flex-col">
           <div className="p-6 border-b border-gold/30">
@@ -134,7 +150,11 @@ export default function Index() {
                         Захватывающая история о невероятном побеге из секретной тюрьмы, где каждая минута на счету.
                       </p>
                       <div className="flex gap-4">
-                        <Button size="lg" className="bg-gold text-black hover:bg-gold/90 font-bold px-8 shadow-gold hover-glow">
+                        <Button 
+                          size="lg" 
+                          className="bg-gold text-black hover:bg-gold/90 font-bold px-8 shadow-gold hover-glow"
+                          onClick={() => handlePlayMovie(mockMovies[0])}
+                        >
                           <Icon name="Play" size={20} className="mr-2" />
                           Смотреть сейчас
                         </Button>
@@ -190,8 +210,14 @@ export default function Index() {
                               <Icon name="Star" size={14} className="text-gold fill-gold" />
                               <span className="text-sm font-bold text-gold">{movie.rating}</span>
                             </div>
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center shadow-gold">
+                            <div 
+                              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlayMovie(movie);
+                              }}
+                            >
+                              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center shadow-gold cursor-pointer hover:scale-110 transition-transform">
                                 <Icon name="Play" size={32} className="text-black ml-1" />
                               </div>
                             </div>
@@ -232,8 +258,14 @@ export default function Index() {
                             <Badge className="absolute top-3 left-3 bg-secondary border-secondary">
                               Сериал
                             </Badge>
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center shadow-gold">
+                            <div 
+                              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlayMovie(series);
+                              }}
+                            >
+                              <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center shadow-gold cursor-pointer hover:scale-110 transition-transform">
                                 <Icon name="Play" size={32} className="text-black ml-1" />
                               </div>
                             </div>
@@ -302,5 +334,6 @@ export default function Index() {
         </main>
       </div>
     </div>
+    </>
   );
 }
